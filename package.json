@@ -1,0 +1,1 @@
+{"name":"i41-clip","version":"1.0.0","private":true,"type":"module","license":"MIT","scripts":{"test":"node --test","dev":"wrangler dev","deploy":"wrangler deploy"},"devDependencies":{"wrangler":"^4.128.0"}}

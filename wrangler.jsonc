@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "i41-clip",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "assets": {
+    "directory": "public",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  },
+  "kv_namespaces": [
+    {
+      "binding": "CLIPS",
+      "id": "0e3bcd414da74aa4af9afe255544584d"
+    }
+  ],
+  "observability": {
+    "enabled": false
+  }
+}
