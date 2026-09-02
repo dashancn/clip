@@ -28,11 +28,21 @@ test('阅后即焚和次数限制在读取后删除', () => {
   assert.deepEqual(ongoing, { delete:false, viewsLeft:2 });
 });
 
-test('安全响应头禁止缓存与嵌入', () => {
+test('安全响应头禁止缓存与嵌入，并仅允许 Cloudflare 匿名统计', () => {
   const headers = securityHeaders();
   assert.equal(headers['Cache-Control'], 'no-store');
   assert.equal(headers['X-Frame-Options'], 'DENY');
   assert.match(headers['Content-Security-Policy'], /frame-ancestors 'none'/);
+  assert.match(headers['Content-Security-Policy'], /script-src 'self' https:\/\/static\.cloudflareinsights\.com/);
+  assert.match(headers['Content-Security-Policy'], /connect-src 'self' https:\/\/cloudflareinsights\.com/);
+});
+
+test('页面接入指定 Cloudflare Web Analytics 并披露匿名统计边界', async () => {
+  const html = await read('public/index.html');
+  assert.match(html, /src="https:\/\/static\.cloudflareinsights\.com\/beacon\.min\.js"/);
+  assert.match(html, /data-cf-beacon='\{"token":"039bd47947bd4fc39a02944edd178b7e"\}'/);
+  assert.ok(html.includes('匿名访问与性能数据'));
+  assert.ok(html.includes('不会包含剪贴板内容、密码或提取码'));
 });
 
 test('页面包含i41导航、客户端加密、TTL和阅后即焚', async () => {
