@@ -42,3 +42,14 @@ test('页面包含i41导航、客户端加密、TTL和阅后即焚', async () =>
   assert.match(app, /AES-GCM/);
   assert.match(app, /PBKDF2/);
 });
+
+test('顶部生态导航和 Hero 横幅使用各自的 i方案 UTM', async () => {
+  const html = await read('public/index.html');
+  assert.match(html, /class="featured" href="https:\/\/www\.i41\.cn\?utm_source=clip&amp;utm_medium=tool_referral&amp;utm_campaign=ifangan&amp;utm_content=ecosystem_nav"/);
+  assert.match(html, /<aside>[\s\S]*?href="https:\/\/www\.i41\.cn\?utm_source=clip&amp;utm_medium=tool_referral&amp;utm_campaign=ifangan&amp;utm_content=promo_banner"[\s\S]*?<\/aside>/);
+});
+
+test('页面展示工具归属并保留开源与临时存储说明', async () => {
+  const html = await read('public/index.html');
+  for (const text of ['i41 免费实用工具', 'MIT License', '不提供永久存储']) assert.ok(html.includes(text));
+});
