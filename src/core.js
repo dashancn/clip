@@ -29,7 +29,7 @@ export function consumeRecord(record) {
 export function securityHeaders() {
   return {
     'Cache-Control': 'no-store',
-    'Content-Security-Policy': "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
+    'Content-Security-Policy': "default-src 'self'; script-src 'self' https://static.cloudflareinsights.com https://stats.i41.cn; style-src 'self'; img-src 'self' data:; connect-src 'self' https://cloudflareinsights.com https://stats.i41.cn; object-src 'none'; base-uri 'self'; frame-ancestors 'none'",
     'Cross-Origin-Opener-Policy': 'same-origin',
     'Referrer-Policy': 'no-referrer',
     'X-Content-Type-Options': 'nosniff',
