@@ -95,18 +95,19 @@ test('Hero 保留关注 i方案横幅及独立 promo_banner UTM', async () => {
   assert.match(html, /<aside>[\s\S]*?<strong>关注 i方案<\/strong>[\s\S]*?<span>获取内容创作、客户跟单、文生图与视频制作方案<\/span>[\s\S]*?href="https:\/\/www\.i41\.cn\?utm_source=clip&amp;utm_medium=tool_referral&amp;utm_campaign=ifangan&amp;utm_content=promo_banner"[\s\S]*?>访问 i方案 →<\/a>[\s\S]*?<\/aside>/);
 });
 
-test('统一导航为白底 64px，i方案加宽且每个入口提供 hover 与 focus 提示', async () => {
-  const [html, css] = await Promise.all([read('public/index.html'), read('public/style.css')]);
+test('统一导航为白底至少 64px，i方案加宽且每个入口提供真实 hover 与 focus 提示', async () => {
+  const [html, css, app] = await Promise.all([read('public/index.html'), read('public/style.css'), read('public/app.js')]);
   const nav = html.match(/<nav aria-label="i41 工具生态">([\s\S]*?)<\/nav>/)?.[1];
   const links = [...nav.matchAll(/<a\b([^>]*)>/g)].map(match => match[1]);
   assert.equal(links.length, 8);
   for (const attributes of links) assert.match(attributes, /\bdata-tooltip="[^"]+"/);
-  assert.match(css, /header\{[^}]*height:64px[^}]*background:#fff/);
-  assert.match(css, /nav \.i-plan-nav\{[^}]*min-width:72px[^}]*padding:[^;}]+[^}]*background:#246bfd[^}]*color:#fff[^}]*font-weight:800/);
-  assert.match(css, /nav a\[data-tooltip\]:hover::after/);
-  assert.match(css, /nav a\[data-tooltip\]:focus-visible::after/);
-  assert.match(css, /nav\{[^}]*scrollbar-width:none/);
-  assert.match(css, /nav::-webkit-scrollbar\{[^}]*display:none/);
+  assert.match(css, /header\{[^}]*min-height:64px[^}]*overflow:visible[^}]*background:#fff/);
+  assert.match(css, /nav \.i-plan-nav\{[^}]*min-width:72px[^}]*padding:[^;}]+[^}]*border-radius:9px[^}]*background:#246bfd[^}]*color:#fff[^}]*font-weight:800[^}]*text-align:center/);
+  assert.match(css, /nav\{[^}]*justify-content:flex-end[^}]*flex-wrap:wrap[^}]*overflow:visible/);
+  assert.doesNotMatch(css, /overflow-x:auto|scrollbar-width|::-webkit-scrollbar/);
+  assert.match(css, /\.nav-tooltip\{[^}]*position:fixed/);
+  assert.match(app, /addEventListener\('mouseover',[\s\S]*?placeNavTooltip/);
+  assert.match(app, /addEventListener\('focusin',[\s\S]*?placeNavTooltip/);
   assert.doesNotMatch(css, /(?:row-reverse|column-reverse|(?:^|[;{])order\s*:)/);
 });
 
