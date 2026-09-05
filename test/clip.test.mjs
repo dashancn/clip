@@ -104,6 +104,7 @@ test('统一导航为白底至少 64px，i方案加宽且每个入口提供真�
   assert.match(css, /header\{[^}]*min-height:64px[^}]*overflow:visible[^}]*background:#fff/);
   assert.match(css, /nav \.i-plan-nav\{[^}]*min-width:72px[^}]*padding:[^;}]+[^}]*border-radius:9px[^}]*background:#246bfd[^}]*color:#fff[^}]*font-weight:800[^}]*text-align:center/);
   assert.match(css, /nav\{[^}]*justify-content:flex-end[^}]*flex-wrap:wrap[^}]*overflow:visible/);
+  assert.match(css, /nav a,nav span\{[^}]*font-size:14px/);
   assert.doesNotMatch(css, /overflow-x:auto|scrollbar-width|::-webkit-scrollbar/);
   assert.match(css, /\.nav-tooltip\{[^}]*position:fixed/);
   assert.match(app, /addEventListener\('mouseover',[\s\S]*?placeNavTooltip/);
