@@ -71,7 +71,8 @@ test('顶部生态导航按统一顺序提供全部九个入口', async () => {
   assert.ok(nav);
 
   const entries = [...nav.matchAll(/<(?:a|span)[^>]*>([^<]+)<\/(?:a|span)>/g)].map(match => match[1]);
-  assert.deepEqual(entries, ['方案', '开发者工具', '图片压缩', '智能抠图', '多图拼接', 'PDF 工具', '证件水印', '临时剪贴板', '证件照']);
+  assert.deepEqual(entries, ['i方案', '开发者工具', '图片压缩', '智能抠图', '多图拼接', 'PDF 工具', '证件水印', '临时剪贴板', '证件照']);
+  assert.match(nav, /<a class="i-plan-nav"[^>]*>i方案<\/a>/);
 
   const urls = [...nav.matchAll(/<a[^>]+href="([^"]+)"/g)].map(match => match[1]);
   assert.deepEqual(urls, [
@@ -92,10 +93,11 @@ test('Hero 保留关注 i方案横幅及独立 promo_banner UTM', async () => {
   assert.match(html, /<aside>[\s\S]*?<strong>关注 i方案<\/strong>[\s\S]*?<span>获取内容创作、客户跟单、文生图与视频制作方案<\/span>[\s\S]*?href="https:\/\/www\.i41\.cn\?utm_source=clip&amp;utm_medium=tool_referral&amp;utm_campaign=ifangan&amp;utm_content=promo_banner"[\s\S]*?>访问 i方案 →<\/a>[\s\S]*?<\/aside>/);
 });
 
-test('统一导航为白底 64px，当前项蓝底白字且移动端不重排', async () => {
+test('统一导航为白底 64px，i方案主 CTA 比当前工具更突出且移动端不重排', async () => {
   const css = await read('public/style.css');
   assert.match(css, /header\{[^}]*height:64px[^}]*background:#fff/);
-  assert.match(css, /nav \[aria-current="page"\]\{[^}]*background:#246bfd[^}]*color:#fff/);
+  assert.match(css, /nav \.i-plan-nav\{[^}]*background:#246bfd[^}]*color:#fff[^}]*font-weight:800/);
+  assert.match(css, /nav \[aria-current="page"\]\{[^}]*background:#eff6ff[^}]*color:#1d4ed8/);
   assert.doesNotMatch(css, /(?:row-reverse|column-reverse|(?:^|[;{])order\s*:)/);
 });
 
