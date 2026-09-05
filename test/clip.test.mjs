@@ -65,13 +65,13 @@ test('页面包含i41导航、客户端加密、TTL和阅后即焚', async () =>
   assert.match(app, /PBKDF2/);
 });
 
-test('顶部生态导航按统一顺序提供全部九个入口', async () => {
+test('顶部生态导航按统一顺序提供当前工具之外的八个入口', async () => {
   const html = await read('public/index.html');
   const nav = html.match(/<nav aria-label="i41 工具生态">([\s\S]*?)<\/nav>/)?.[1];
   assert.ok(nav);
 
   const entries = [...nav.matchAll(/<(?:a|span)[^>]*>([^<]+)<\/(?:a|span)>/g)].map(match => match[1]);
-  assert.deepEqual(entries, ['i方案', '开发者工具', '图片压缩', '智能抠图', '多图拼接', 'PDF 工具', '证件水印', '临时剪贴板', '证件照']);
+  assert.deepEqual(entries, ['i方案', '开发者工具', '图片压缩', '智能抠图', '多图拼接', 'PDF 工具', '证件水印', '证件照']);
   assert.match(nav, /<a class="i-plan-nav"[^>]*>i方案<\/a>/);
 
   const urls = [...nav.matchAll(/<a[^>]+href="([^"]+)"/g)].map(match => match[1]);
@@ -85,7 +85,9 @@ test('顶部生态导航按统一顺序提供全部九个入口', async () => {
     'https://watermark.i41.cn',
     'https://idphoto.i41.cn'
   ]);
-  assert.match(nav, /<span aria-current="page">临时剪贴板<\/span>/);
+  assert.doesNotMatch(nav, /临时剪贴板/);
+  assert.match(html, /<a class="brand"[^>]*>[\s\S]*?<strong>i41 临时剪贴板<\/strong><\/a>/);
+  for (const [, attributes] of html.matchAll(/<a\b([^>]*)>/g)) assert.doesNotMatch(attributes, /\s(?:target|rel)="[^"]*"/);
 });
 
 test('Hero 保留关注 i方案横幅及独立 promo_banner UTM', async () => {
@@ -93,11 +95,18 @@ test('Hero 保留关注 i方案横幅及独立 promo_banner UTM', async () => {
   assert.match(html, /<aside>[\s\S]*?<strong>关注 i方案<\/strong>[\s\S]*?<span>获取内容创作、客户跟单、文生图与视频制作方案<\/span>[\s\S]*?href="https:\/\/www\.i41\.cn\?utm_source=clip&amp;utm_medium=tool_referral&amp;utm_campaign=ifangan&amp;utm_content=promo_banner"[\s\S]*?>访问 i方案 →<\/a>[\s\S]*?<\/aside>/);
 });
 
-test('统一导航为白底 64px，i方案主 CTA 比当前工具更突出且移动端不重排', async () => {
-  const css = await read('public/style.css');
+test('统一导航为白底 64px，i方案加宽且每个入口提供 hover 与 focus 提示', async () => {
+  const [html, css] = await Promise.all([read('public/index.html'), read('public/style.css')]);
+  const nav = html.match(/<nav aria-label="i41 工具生态">([\s\S]*?)<\/nav>/)?.[1];
+  const links = [...nav.matchAll(/<a\b([^>]*)>/g)].map(match => match[1]);
+  assert.equal(links.length, 8);
+  for (const attributes of links) assert.match(attributes, /\bdata-tooltip="[^"]+"/);
   assert.match(css, /header\{[^}]*height:64px[^}]*background:#fff/);
-  assert.match(css, /nav \.i-plan-nav\{[^}]*background:#246bfd[^}]*color:#fff[^}]*font-weight:800/);
-  assert.match(css, /nav \[aria-current="page"\]\{[^}]*background:#eff6ff[^}]*color:#1d4ed8/);
+  assert.match(css, /nav \.i-plan-nav\{[^}]*min-width:72px[^}]*padding:[^;}]+[^}]*background:#246bfd[^}]*color:#fff[^}]*font-weight:800/);
+  assert.match(css, /nav a\[data-tooltip\]:hover::after/);
+  assert.match(css, /nav a\[data-tooltip\]:focus-visible::after/);
+  assert.match(css, /nav\{[^}]*scrollbar-width:none/);
+  assert.match(css, /nav::-webkit-scrollbar\{[^}]*display:none/);
   assert.doesNotMatch(css, /(?:row-reverse|column-reverse|(?:^|[;{])order\s*:)/);
 });
 
@@ -108,7 +117,11 @@ test('隐私徽章准确说明客户端加密与自动过期', async () => {
   assert.ok(!privacy?.includes('纯本地'));
 });
 
-test('页面展示工具归属并保留开源与临时存储说明', async () => {
+test('页脚保持极短可见行并默认折叠隐私、开源与临时存储说明', async () => {
   const html = await read('public/index.html');
-  for (const text of ['i41 免费实用工具', 'MIT License', '不提供永久存储']) assert.ok(html.includes(text));
+  const footer = html.match(/<footer>([\s\S]*?)<\/footer>/)?.[1];
+  assert.ok(footer);
+  assert.match(footer, /^i41 免费实用工具 · <details><summary>说明<\/summary>/);
+  assert.doesNotMatch(footer, /<details\s+open/);
+  for (const text of ['隐私', 'MIT License', '不提供永久存储', '不会包含剪贴板内容、密码或提取码', '永久标识']) assert.ok(footer.includes(text));
 });
