@@ -65,20 +65,22 @@ test('页面包含i41导航、客户端加密、TTL和阅后即焚', async () =>
   assert.match(app, /PBKDF2/);
 });
 
-test('顶部生态导航按统一顺序提供当前工具之外的八个入口', async () => {
+test('顶部生态导航按统一顺序提供当前工具之外的九个入口', async () => {
   const html = await read('public/index.html');
   const nav = html.match(/<nav aria-label="i41 工具生态">([\s\S]*?)<\/nav>/)?.[1];
   assert.ok(nav);
 
   const entries = [...nav.matchAll(/<(?:a|span)[^>]*>([^<]+)<\/(?:a|span)>/g)].map(match => match[1]);
-  assert.deepEqual(entries, ['i方案', '开发者工具', '图片压缩', '智能抠图', '多图拼接', 'PDF 工具', '证件水印', '证件照']);
+  assert.deepEqual(entries, ['i方案', '开发者工具', '图片压缩', 'HEIC 转换', '智能抠图', '多图拼接', 'PDF 工具', '证件水印', '证件照']);
   assert.match(nav, /<a class="i-plan-nav"[^>]*>i方案<\/a>/);
+  assert.match(nav, /<a href="https:\/\/imgzip\.i41\.cn\/heic-converter\/" data-tooltip="在线转换 HEIC 图片格式">HEIC 转换<\/a>/);
 
   const urls = [...nav.matchAll(/<a[^>]+href="([^"]+)"/g)].map(match => match[1]);
   assert.deepEqual(urls, [
     'https://www.i41.cn?utm_source=clip&amp;utm_medium=tool_referral&amp;utm_campaign=ifangan&amp;utm_content=ecosystem_nav',
     'https://tools.i41.cn',
     'https://imgzip.i41.cn',
+    'https://imgzip.i41.cn/heic-converter/',
     'https://imgzip.i41.cn/remove-background/',
     'https://imgzip.i41.cn/collage/',
     'https://pdf.i41.cn',
@@ -99,7 +101,7 @@ test('统一导航为白底至少 64px，i方案加宽且每个入口提供真�
   const [html, css, app] = await Promise.all([read('public/index.html'), read('public/style.css'), read('public/app.js')]);
   const nav = html.match(/<nav aria-label="i41 工具生态">([\s\S]*?)<\/nav>/)?.[1];
   const links = [...nav.matchAll(/<a\b([^>]*)>/g)].map(match => match[1]);
-  assert.equal(links.length, 8);
+  assert.equal(links.length, 9);
   for (const attributes of links) assert.match(attributes, /\bdata-tooltip="[^"]+"/);
   assert.match(css, /header\{[^}]*min-height:64px[^}]*overflow:visible[^}]*background:#fff/);
   assert.match(css, /nav \.i-plan-nav\{[^}]*min-width:72px[^}]*padding:[^;}]+[^}]*border-radius:9px[^}]*background:#246bfd[^}]*color:#fff[^}]*font-weight:800[^}]*text-align:center/);
